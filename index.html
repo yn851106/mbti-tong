@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통장님 맞춤형 MBTI 자기 분석</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white shadow-md py-6 px-4 text-center">
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">🏘️ 통장님 맞춤형 MBTI 자기 분석</h1>
+        <p class="text-indigo-200 text-sm mt-1">행정 현장과 주민 소통 속 나의 성향을 알아보는 맞춤 진단</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl flex-grow">
+        
+        <!-- Intro Section -->
+        <div id="intro-screen" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center">
+            <div class="inline-block p-4 bg-indigo-50 rounded-full text-indigo-600 mb-4 text-4xl">📊</div>
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-3">우리 마을을 누비는 통장님의 진짜 성향은?</h2>
+            <p class="text-slate-600 text-sm md:text-base leading-relaxed mb-6">
+                반상회 진행, 주민 민원 중재, 행정 서류 안내 등 바쁜 현장 업무 속에서 <br class="hidden sm:inline">
+                나는 어떤 스타일로 소통하고 대처하는지 총 48문항으로 정밀하게 진단해 드립니다.
+            </p>
+            <button onclick="startQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition duration-200 text-lg">
+                진단 시작하기 (총 48문항)
+            </button>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz-screen" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span id="progress-text" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">문항 1 / 48</span>
+                <span id="category-badge" class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">소통 스타일</span>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 2%;"></div>
+            </div>
+
+            <h3 id="question-text" class="text-lg md:text-xl font-bold text-slate-900 mb-6 leading-snug">질문 내용이 들어갑니다.</h3>
+
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamic Options -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                <button id="prev-btn" onclick="prevQuestion()" class="hidden px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+                    이전 질문
+                </button>
+                <div class="ml-auto"></div>
+            </div>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loading-screen" class="hidden text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div>
+            <h3 class="text-lg font-bold text-slate-800">통장님 성향 분석 중...</h3>
+            <p class="text-slate-500 text-sm mt-1">현장 데이터와 응답 패턴을 정밀하게 조합하고 있습니다.</p>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-screen" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="text-center pb-6 border-b border-slate-100 mb-6">
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">진단 완료</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2" id="result-mbti">ESTJ-A</h2>
+                <p id="result-title" class="text-indigo-600 font-semibold text-base mt-1">마을 행정의 든든한 추진력 대장</p>
+            </div>
+
+            <!-- 성향 설명 -->
+            <div class="bg-indigo-50/50 rounded-xl p-5 mb-6">
+                <h4 class="font-bold text-slate-800 mb-2 flex items-center">
+                    <span class="mr-2">💡</span> 통장님 유형 주요 특징
+                </h4>
+                <p id="result-desc" class="text-sm text-slate-700 leading-relaxed">설명이 들어갑니다.</p>
+            </div>
+
+            <!-- 업무 강점 및 꿀팁 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100">
+                    <h5 class="font-bold text-emerald-800 text-sm mb-2">⭐ 현장 업무 강점</h5>
+                    <p id="result-strength" class="text-xs text-slate-700 leading-relaxed">강점 내용</p>
+                </div>
+                <div class="bg-amber-50/50 rounded-xl p-4 border border-amber-100">
+                    <h5 class="font-bold text-amber-800 text-sm mb-2">💡 맞춤 소통 꿀팁</h5>
+                    <p id="result-tip" class="text-xs text-slate-700 leading-relaxed">꿀팁 내용</p>
+                </div>
+            </div>
+
+            <!-- 차트 영역 -->
+            <div class="mb-8">
+                <h4 class="font-bold text-slate-800 text-sm mb-3">📈 성향별 세부 비율</h4>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <canvas id="mbtiChart" height="180"></canvas>
+                </div>
+            </div>
+
+            <!-- 재검사 버튼 -->
+            <button onclick="location.reload()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl transition duration-200 text-sm">
+                다시 검사하기
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-slate-400">
+        &copy; 통장님 맞춤형 MBTI 자기 분석 웹앱. All rights reserved.
+    </footer>
+
+    <!-- Script -->
+    <script>
+        const questions = [
+            { text: "주민총회나 마을 행사 날, 수많은 주민들과 인사를 나누고 어울릴 때 나의 상태는?", cat: "주민 소통 성향", options: [
+                { text: "사람들과 어울릴수록 에너지가 넘치고 활력이 샘솟는다.", type: "E", score: 2 },
+                { text: "활기차지만, 행사가 끝난 후 혼자만의 재충전 시간이 반드시 필요하다.", type: "I", score: 2 }
+            ]},
+            { text: "새로운 가구가 마을에 전입해 왔을 때, 환영 인사나 안내를 건네는 방식은?", cat: "주민 소통 성향", options: [
+                { text: "먼저 찾아가 반갑게 인사를 건네며 적극적으로 마을 소식을 전한다.", type: "E", score: 2 },
+                { text: "부담스럽지 않게 안내 책자를 전하거나 연락이 올 때 차분히 응대한다.", type: "I", score: 2 }
+            ]},
+            { text: "동 행정복지센터 회의에 참석했을 때 나의 발언 성향은?", cat: "주민 소통 성향", options: [
+                { text: "회의 중 적극적으로 의견을 내고 토론을 주도하는 편이다.", type: "E", score: 2 },
+                { text: "주로 내용을 경청하며 꼭 필요한 핵심 의견만 정돈해서 전달한다.", type: "I", score: 2 }
+            ]},
+            { text: "평소 주민들과 소통하고 공지사항을 전달하는 선호 채널은?", cat: "주민 소통 성향", options: [
+                { text: "마을회관에 직접 찾아가거나 모임을 열어 대면으로 소통하는 것을 즐긴다.", type: "E", score: 2 },
+                { text: "문자 메시지, 단톡방, 안내문 등 정돈된 텍스트 수단을 선호한다.", type: "I", score: 2 }
+            ]},
+            { text: "마을 대청소나 방역 봉사 등 단체 활동을 할 때의 나의 모습은?", cat: "주민 소통 성향", options: [
+                { text: "주민들을 큰 목소리로 독려하고 맨 앞에서 분위기를 이끈다.", type: "E", score: 2 },
+                { text: "묵묵히 제 맡은 구역을 완벽하게 처리하며 필요한 곳을 지원한다.", type: "I", score: 2 }
+            ]},
+            { text: "주민들 간의 모임이나 행사에서 대화를 주도하는 주체는?", cat: "주민 소통 성향", options: [
+                { text: "내가 먼저 대화를 이끌어가며 화기애애한 분위기를 만든다.", type: "E", score: 2 },
+                { text: "주로 상대방의 이야기를 깊이 있게 들어주는 편이다.", type: "I", score: 2 }
+            ]},
+            { text: "연속으로 여러 건의 민원 상담이나 현장 방문 일정이 잡혔을 때?", cat: "주민 소통 성향", options: [
+                { text: "사람들을 계속 만나는 것이 크게 지치지 않고 즐겁다.", type: "E", score: 2 },
+                { text: "일정이 끝난 후 혼자 조용히 휴식을 취하며 에너지를 채워야 한다.", type: "I", score: 2 }
+            ]},
+            { text: "마을 행사를 기획할 때 사람들과 협업하는 방식은?", cat: "주민 소통 성향", options: [
+                { text: "여러 사람과 수시로 만나 아이디어를 즉석에서 주고받는 것이 좋다.", type: "E", score: 2 },
+                { text: "혼자 깊이 구상한 뒤 완성된 안을 사람들에게 공유한다.", type: "I", score: 2 }
+            ]},
+            { text: "낯선 주민이나 처음 뵙는 유관기관 담당자와 대면할 때?", cat: "주민 소통 성향", options: [
+                { text: "어색함 없이 자연스럽게 말을 트고 친근하게 다가간다.", type: "E", score: 2 },
+                { text: "예의를 갖추어 정중하게 인사를 나누며 차분하게 대화를 시작한다.", type: "I", score: 2 }
+            ]},
+            { text: "하루 일과를 마치고 저녁 시간에 주로 하는 생각은?", cat: "주민 소통 성향", options: [
+                { text: "오늘 만났던 주민들과 나눈 이야기와 활기찬 현장 풍경이 떠오른다.", type: "E", score: 2 },
+                { text: "오늘 하루 처리한 업무와 혼자 정리했던 생각들을 차분히 되돌아본다.", type: "I", score: 2 }
+            ]},
+            { text: "동네 골목길 가등 정비나 환경 개선 건의를 할 때 나의 접근법은?", cat: "주민 소통 성향", options: [
+                { text: "주민들과 직접 만나 의견을 모으고 현장을 발로 뛰며 목소리를 낸다.", type: "E", score: 2 },
+                { text: "기존 민원 사례와 데이터를 분석하여 조용히 서면으로 건의한다.", type: "I", score: 2 }
+            ]},
+            { text: "통장 단체 모임이나 워크숍 장소에 도착했을 때의 태도는?", cat: "주민 소통 성향", options: [
+                { text: "반갑게 인사하며 여러 분들의 자리에 먼저 다가가 말을 건다.", type: "E", score: 2 },
+                { text: "아는 분들과 조용히 인사를 나누고 차분하게 자리에 앉는다.", type: "I", score: 2 }
+            ]},
+
+            { text: "행정 기관에서 내려온 지침 공문을 읽을 때 집중하는 포인트는?", cat: "업무 인식 성향", options: [
+                { text: "제출 기한, 대상자 조건, 지원 금액 등 구체적인 숫자와 사실 관계", type: "S", score: 2 },
+                { text: "이 정책이 도입된 취지, 앞으로 마을에 미칠 장기적 변화와 비전", type: "N", score: 2 }
+            ]},
+            { text: "주민이 복지 혜택에 대해 물어봤을 때 설명하는 방식은?", cat: "업무 인식 성향", options: [
+                { text: "매뉴얼에 명시된 자격 요건과 절차를 정확하고 단계별로 안내한다.", type: "S", score: 2 },
+                { text: "주민의 전체적인 생활 상황을 살피고 어울리는 다른 제도까지 폭넓게 제안한다.", type: "N", score: 2 }
+            ]},
+            { text: "마을 잔치나 행사를 준비할 때 중요하게 생각하는 요소는?", cat: "업무 인식 성향", options: [
+                { text: "예산 배정, 식순, 안전사고 예방 등 눈에 보이는 실무적 준비물", type: "S", score: 2 },
+                { text: "행사가 주는 의미, 주민들이 함께 즐거워하는 전체적인 분위기와 감동", type: "N", score: 2 }
+            ]},
+            { text: "과거에 발생했던 마을 민원이나 사고를 해결할 때 참고하는 것은?", cat: "업무 인식 성향", options: [
+                { text: "작년이나 재작년에 실제로 효과를 보았던 검증된 해결 매뉴얼", type: "S", score: 2 },
+                { text: "이번 사건만의 특수한 맥락과 새로운 아이디어를 통한 창의적 해결책", type: "N", score: 2 }
+            ]},
+            { text: "새로운 스마트 마을 방송 시스템이나 행정 앱을 도입할 때 나의 태도는?", cat: "업무 인식 성향", options: [
+                { text: "기존에 쓰던 방식과 비교해 실용적인 편리함이 있는지 먼저 확인한다.", type: "S", score: 2 },
+                { text: "이 시스템이 앞으로 우리 마을 소통 방식을 어떻게 혁신할지 상상해본다.", type: "N", score: 2 }
+            ]},
+            { text: "동네 순찰 중 골목길 파손이나 위험 요소를 발견했을 때", cat: "업무 인식 성향", options: [
+                { text: "파손된 위치, 크기, 긴급 복구 여부 등 현상 그대로를 정확히 파악한다.", type: "S", score: 2 },
+                { text: "이 파손이 발생한 근본적인 원인이나 상습적인 구조적 문제점을 유추해본다.", type: "N", score: 2 }
+            ]},
+            { text: "주민들에게 전달할 안내문을 작성할 때 가장 신경 쓰는 부분은?", cat: "업무 인식 성향", options: [
+                { text: "날짜, 시간, 장소 등 오탈자 없이 명확하게 정보가 전달되었는지 여부", type: "S", score: 2 },
+                { text: "주민들이 읽었을 때 마음이 움직이고 쉽게 공감할 수 있는 문구", type: "N", score: 2 }
+            ]},
+            { text: "행정 복지 사각지대 발굴 조사를 나갈 때 나의 시선은?", cat: "업무 인식 성향", options: [
+                { text: "눈앞에 보이는 주거 환경 상태와 당장 필요한 생필품 지원 여부", type: "S", score: 2 },
+                { text: "이웃과의 관계 단절이나 정서적 어려움 등 보이지 않는 부분까지 헤아림", type: "N", score: 2 }
+            ]},
+            { text: "주민 의견 수렴 회의에서 누군가 새로운 아이디어를 제안했을 때", cat: "업무 인식 성향", options: [
+                { text: "현실적으로 예산과 인력이 가능한지 실현 가능성부터 따져본다.", type: "S", score: 2 },
+                { text: "아이디어가 가진 독창성과 잠재적 가능성에 먼저 흥미를 느낀다.", type: "N", score: 2 }
+            ]},
+            { text: "마을 발전 계획 브리핑을 들을 때 나의 집중 포인트는?", cat: "업무 인식 성향", options: [
+                { text: "우리 통(統)에 구체적으로 어떤 혜택과 변화가 돌아오는지 확인한다.", type: "S", score: 2 },
+                { text: "장기적으로 우리 지역이 어떤 모습으로 발전할지 큰 그림을 그려본다.", type: "N", score: 2 }
+            ]},
+            { text: "통장 업무 관련 교육을 받을 때 선호하는 강의 내용은?", cat: "업무 인식 성향", options: [
+                { text: "실무에서 바로 써먹을 수 있는 행정 절차와 수당 지급 기준 안내", type: "S", score: 2 },
+                { text: "급변하는 사회 트렌드와 미래 지역 공동체의 역할에 대한 통찰", type: "N", score: 2 }
+            ]},
+            { text: "마을 현안에 대해 보고할 때 선호하는 방식은?", cat: "업무 인식 성향", options: [
+                { text: "정리된 수치와 통계, 날짜별 일지 중심의 객관적 보고", type: "S", score: 2 },
+                { text: "현장의 생생한 흐름과 의미를 담은 스토리텔링 형식의 보고", type: "N", score: 2 }
+            ]},
+
+            { text: "이웃 주민 간에 심한 다툼이 생겨 중재를 부탁받았을 때 나의 첫 반응은?", cat: "판단 및 의사결정", options: [
+                { text: "양쪽의 시시비비를 객관적으로 따져보고 규정과 원칙에 따라 판단한다.", type: "T", score: 2 },
+                { text: "양쪽의 속상한 감정에 깊이 공감하며 마음을 먼저 위로해 준다.", type: "F", score: 2 }
+            ]},
+            { text: "행정 지원금이나 물품 배분 대상자를 선정할 때 원칙은?", cat: "판단 및 의사결정", options: [
+                { text: "공정하고 엄격한 기준에 맞춰 한 치의 오차도 없이 배분한다.", type: "T", score: 2 },
+                { text: "규정의 테두리 안에서 특별히 더 힘든 사정이 있는 분들을 인간적으로 배려한다.", type: "F", score: 2 }
+            ]},
+            { text: "동료 통장이 업무 처리에 실수를 했을 때 피드백을 주는 방식은?", cat: "판단 및 의사결정", options: [
+                { text: "무엇이 잘못되었는지 논리적이고 명확하게 짚어주어 재발을 막는다.", type: "T", score: 2 },
+                { text: "상대가 상처받지 않도록 조심스럽게 격려하며 부드럽게 조언한다.", type: "F", score: 2 }
+            ]},
+            { text: "마을 사업 예산을 집행할 때 가장 중요하게 고려하는 기준은?", cat: "판단 및 의사결정", options: [
+                { text: "비용 대비 효과가 가장 극대화되는 가성비와 효율성", type: "T", score: 2 },
+                { text: "주민들이 느끼는 만족감과 공동체 화합에 미치는 긍정적 영향", type: "F", score: 2 }
+            ]},
+            { text: "주민이 불만을 제기하며 동 행정의 문제점을 강하게 지적할 때", cat: "판단 및 의사결정", options: [
+                { text: "사실 관계를 정확히 분석하고 행정적 절차의 타당성을 논리적으로 설명한다.", type: "T", score: 2 },
+                { text: "그동안 얼마나 마음고생이 많으셨을지 그 감정에 먼저 공감하고 사과한다.", type: "F", score: 2 }
+            ]},
+            { text: "마을 총회에서 의견이 첨예하게 대립할 때 결정을 내리는 기준은?", cat: "판단 및 의사결정", options: [
+                { text: "합리적인 근거와 투표 결과 등 공정하고 타당한 논리에 따른다.", type: "T", score: 2 },
+                { text: "모두가 상처받지 않고 원만하게 합의점을 찾을 수 있는 방향을 택한다.", type: "F", score: 2 }
+            ]},
+            { text: "어려운 이웃을 돕는 봉사활동 계획을 검토할 때", cat: "판단 및 의사결정", options: [
+                { text: "실질적으로 가장 시급하고 효과적인 지원이 되는지 분석한다.", type: "T", score: 2 },
+                { text: "따뜻한 정을 나누고 이웃 간의 온정을 느끼게 하는 데 초점을 둔다.", type: "F", score: 2 }
+            ]},
+            { text: "주민 단톡방에 올라온 민원 글에 답변을 남길 때", cat: "판단 및 의사결정", options: [
+                { text: "정확한 처리 부서와 연락처, 진행 상황을 간결하고 명확하게 안내한다.", type: "T", score: 2 },
+                { text: "늦은 시간 고생 많으셨다며 따뜻한 위로와 격려의 말을 먼저 건넨다.", type: "F", score: 2 }
+            ]},
+            { text: "마을 일로 성과를 거두었을 때 칭찬을 받는다면?", cat: "판단 및 의사결정", options: [
+                { text: "업무 처리가 완벽했고 효율적이었다는 능력에 대한 인정이 좋다.", type: "T", score: 2 },
+                { text: "마을을 위해 애쓰는 진심과 따뜻한 노력을 알아주는 것이 좋다.", type: "F", score: 2 }
+            ]},
+            { text: "새로운 통장 업무 규칙이 생겼을 때 나의 태도는?", cat: "판단 및 의사결정", options: [
+                { text: "규칙의 합리성과 효율성을 따져보며 객관적으로 수용한다.", type: "T", score: 2 },
+                { text: "이 규칙이 주민들에게 미칠 영향과 현장 정서를 먼저 고려한다.", type: "F", score: 2 }
+            ]},
+            { text: "주민 고충을 들은 후 행정기관에 전달할 때의 어조는?", cat: "판단 및 의사결정", options: [
+                { text: "팩트 위주로 문제점을 일목요연하게 정리하여 전달한다.", type: "T", score: 2 },
+                { text: "주민이 겪은 억울함과 간절한 마음이 잘 전달되도록 호소력 있게 전한다.", type: "F", score: 2 }
+            ]},
+            { text: "중대한 마을 결정을 앞두고 의견을 조율할 때", cat: "판단 및 의사결정", options: [
+                { text: "이익과 손해를 냉정하게 따져서 가장 타당한 결론을 내린다.", type: "T", score: 2 },
+                { text: "모두의 입장을 배려하며 서운해하는 사람이 없도록 세심하게 살핀다.", type: "F", score: 2 }
+            ]},
+
+            { text: "월간 통장 업무 일정이나 마을 행사 계획을 세울 때", cat: "업무 생활 양식", options: [
+                { text: "날짜별로 꼼꼼하게 스케줄을 짜고 계획대로 철저히 진행한다.", type: "J", score: 2 },
+                { text: "큰 틀만 잡아두고 그날그날 상황에 맞춰 유연하게 대처한다.", type: "P", score: 2 }
+            ]},
+            { text: "행정 서류 제출 마감일이 다가올 때 나의 작업 스타일은?", cat: "업무 생활 양식", options: [
+                { text: "미리미리 여유 있게 작성하여 마감일 훨씬 전에 제출한다.", type: "J", score: 2 },
+                { text: "마감 직전의 집중력을 발휘해 일괄적으로 깔끔하게 마무리한다.", type: "P", score: 2 }
+            ]},
+            { text: "갑작스러운 돌발 민원이나 예상치 못한 마을 행사가 발생했을 때", cat: "업무 생활 양식", options: [
+                { text: "당황스럽지만 기존 계획을 수정해 체계적으로 수습하려 한다.", type: "J", score: 2 },
+                { text: "상황에 발 빠르게 적응하며 즉흥적으로 해결책을 찾아낸다.", type: "P", score: 2 }
+            ]},
+            { text: "우리 집 통(統) 관리 구역을 정돈하는 방식은?", cat: "업무 생활 양식", options: [
+                { text: "담당 구역과 명부를 체계적으로 분류하고 깔끔하게 정리해 둔다.", type: "J", score: 2 },
+                { text: "필요할 때 바로바로 찾아쓸 수 있도록 유연하게 관리한다.", type: "P", score: 2 }
+            ]},
+            { text: "주민 회의를 진행할 때의 스타일은?", cat: "업무 생활 양식", options: [
+                { text: "사전에 준비된 안건과 시간표에 맞춰 회의를 철저히 통제한다.", type: "J", score: 2 },
+                { text: "흐름에 따라 자유롭게 의견을 주고받는 개방적인 토론을 즐긴다.", type: "P", score: 2 }
+            ]},
+            { text: "마을 대청소나 방역 일정이 잡혔을 때 준비 과정은?", cat: "업무 생활 양식", options: [
+                { text: "필요한 도구와 인원을 미리 다 체크하고 완벽하게 준비해 둔다.", type: "J", score: 2 },
+                { text: "전날이나 당일 현장 상황을 보며 유연하게 도구를 챙긴다.", type: "P", score: 2 }
+            ]},
+            
+            { text: "주민들 앞에서 마을 사업 설명이나 발표를 마친 직후 나의 마음은?", cat: "자기확신 및 민감도", options: [
+                { text: "'이 정도면 깔끔하게 잘 끝냈다!'라며 스스로에게 만족하고 홀가분해한다.", type: "A", score: 2 },
+                { text: "'아까 그 말을 다르게 했어야 했는데'라며 아쉬움과 걱정이 남는다.", type: "T_score", score: 2 }
+            ]},
+            { text: "주민들 간의 갈등을 중재하고 돌아온 날 밤에", cat: "자기확신 및 민감도", options: [
+                { text: "내 역할은 다했으니 편안한 마음으로 푹 잘 잔다.", type: "A", score: 2 },
+                { text: "혹시 내 말 때문에 서운해한 사람이 없을지 자꾸 곱씹어 보게 된다.", type: "T_score", score: 2 }
+            ]},
+            { text: "행정 기관에서 새로운 지침이나 과도한 업무가 내려왔을 때", cat: "자기확신 및 민감도", options: [
+                { text: "'뭐, 어떻게든 다 해결할 수 있겠지'라며 긍정적으로 대처한다.", type: "A", score: 2 },
+                { text: "'내가 이걸 실수 없이 잘 해낼 수 있을까' 걱정이 앞선다.", type: "T_score", score: 2 }
+            ]},
+            { text: "통장으로서 내 활동에 대한 주민들의 반응이나 평가를 마주할 때", cat: "자기확신 및 민감도", options: [
+                { text: "칭찬은 기쁘게 받고 비판은 쿨하게 넘기며 멘탈을 잘 유지한다.", type: "A", score: 2 },
+                { text: "작은 비판이나 쓴소리에도 마음이 오래 쓰이고 신경이 많이 쓰인다.", type: "T_score", score: 2 }
+            ]},
+            { text: "바쁜 통장 임무를 수행하면서 내 일상과 심리 상태는?", cat: "자기확신 및 민감도", options: [
+                { text: "스트레스를 크게 받지 않고 내 페이스를 당당하게 유지한다.", type: "A", score: 2 },
+                { text: "혹시 실수를 하지 않을까 늘 긴장하며 완벽을 기하려고 노력한다.", type: "T_score", score: 2 }
+            ]},
+            { text: "마을 대표로서 중요한 결정을 내렸을 때 나의 태도는?", cat: "자기확신 및 민감도", options: [
+                { text: "내가 내린 결정에 흔들림 없이 확신을 가지고 밀고 나간다.", type: "A", score: 2 },
+                { text: "결정 후에도 더 좋은 방법이 없었을지 끊임없이 점검하고 불안해한다.", type: "T_score", score: 2 }
+            ]},
+            { text: "주민 단톡방이나 모임에서 갑작스러운 항의나 불만을 들었을 때", cat: "자기확신 및 민감도", options: [
+                { text: "침착하게 원인을 파악하고 의연하게 대처한다.", type: "A", score: 2 },
+                { text: "가슴이 철렁 내려앉고 당장 어떻게 수습해야 할지 마음이 급해진다.", type: "T_score", score: 2 }
+            ]},
+            { text: "한 해 동안의 통장 임무를 마무리하는 시점에 나의 소감은?", cat: "자기확신 및 민감도", options: [
+                { text: "'올 한해 정말 수고 많았다!'라며 스스로를 자랑스럽게 여긴다.", type: "A", score: 2 },
+                { text: "'더 잘할 수 있었는데 아쉽다'며 부족했던 점이 먼저 떠오른다.", type: "T_score", score: 2 }
+            ]}
+        ];
+
+        let currentIdx = 0;
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0, A: 0, T_score: 0 };
+        let userAnswers = [];
+
+        const introScreen = document.getElementById('intro-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const categoryBadge = document.getElementById('category-badge');
+        const prevBtn = document.getElementById('prev-btn');
+
+        function startQuiz() {
+            introScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentIdx];
+            questionText.textContent = q.text;
+            categoryBadge.textContent = q.cat;
+            progressText.textContent = `문항 ${currentIdx + 1} / ${questions.length}`;
+            progressBar.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+
+            if (currentIdx > 0) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/50 transition duration-200 font-medium text-slate-700 text-sm md:text-base flex items-center justify-between group";
+                btn.innerHTML = `<span>${opt.text}</span><span class="text-xs text-slate-400 group-hover:text-indigo-600 font-bold ml-2">선택 &gt;</span>`;
+                btn.onclick = () => selectOption(opt.type, opt.score);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(type, score) {
+            userAnswers.push({ type, score });
+
+            if (type === 'E') scores.E += score;
+            else if (type === 'I') scores.I += score;
+            else if (type === 'S') scores.S += score;
+            else if (type === 'N') scores.N += score;
+            else if (type === 'T') scores.T += score;
+            else if (type === 'F') scores.F += score;
+            else if (type === 'J') scores.J += score;
+            else if (type === 'P') scores.P += score;
+            else if (type === 'A') scores.A += score;
+            else if (type === 'T_score') scores.T_score += score;
+
+            currentIdx++;
+
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showLoading();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                const lastAns = userAnswers.pop();
+                if (lastAns.type === 'E') scores.E -= lastAns.score;
+                else if (lastAns.type === 'I') scores.I -= lastAns.score;
+                else if (lastAns.type === 'S') scores.S -= lastAns.score;
+                else if (lastAns.type === 'N') scores.N -= lastAns.score;
+                else if (lastAns.type === 'T') scores.T -= lastAns.score;
+                else if (lastAns.type === 'F') scores.F -= lastAns.score;
+                else if (lastAns.type === 'J') scores.J -= lastAns.score;
+                else if (lastAns.type === 'P') scores.P -= lastAns.score;
+                else if (lastAns.type === 'A') scores.A -= lastAns.score;
+                else if (lastAns.type === 'T_score') scores.T_score -= lastAns.score;
+
+                loadQuestion();
+            }
+        }
+
+        function showLoading() {
+            quizScreen.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+            setTimeout(calculateResult, 1500);
+        }
+
+        const mbtiDescriptions = {
+            "ESTJ": { title: "마을 행정의 든든한 추진력 대장", desc: "원칙과 규정을 철저히 지키며, 반상회나 마을 행사를 한 치의 오차도 없이 완벽하게 이끌어가는 리더십의 소유자입니다.", strength: "체계적인 일정 관리, 명확한 공지 전달, 문제 해결의 신속함", tip: "주민들의 다양한 의견에 조금 더 부드럽게 공감해 주면 완벽합니다." },
+            "ENTJ": { title: "마을 발전을 이끄는 혁신적 리더", desc: "장기적인 안목으로 마을의 숙원 사업을 기획하고, 효율적인 시스템을 도입하여 변화를 주도합니다.", strength: "탁월한 기획력, 추진력, 거시적인 비전 제시", tip: "급할수록 주민들의 속도에 맞추어 여유를 가져보세요." },
+            "ESFJ": { title: "마을 공동체의 따뜻한 어머니·아버지", desc: "주민들 간의 정을 살피고 화합을 도모하며, 소외된 이웃을 찾아가 마음을 나누는 최고의 소통가입니다.", strength: "탁월한 공감 능력, 주민 화합 도모, 세심한 배려", tip: "모든 사람을 만족시키려다 본인이 지칠 수 있으니 적절한 휴식을 취하세요." },
+            "ENFJ": { title: "주민들의 신뢰를 한몸에 받는 소통 리더", desc: "모두가 행복한 마을을 만들기 위해 열정적으로 소통하고, 갈등 상황을 지혜롭게 중재합니다.", strength: "뛰어난 설득력, 포용력, 모임 분위기 조성", tip: "객관적인 원칙과 행정 절차도 함께 챙기면 더욱 완벽합니다." },
+            "ISTJ": { title: "묵묵히 마을을 지키는 행정의 수호자", desc: "주어진 임무를 묵묵히 완수하며, 정확한 데이터와 규정에 기반하여 실수를 허용하지 않는 든든한 통장님입니다.", strength: "철저한 책임감, 정확성, 신뢰할 수 있는 일 처리", tip: "때로는 유연하게 주민들의 의견을 수용하는 융통성도 좋습니다." },
+            "INTJ": { title: "철저한 분석과 지혜로 무장한 전략가", desc: "현장 상황을 냉철하게 분석하고 가장 합리적인 해결책을 찾아내어 불필요한 낭비를 줄입니다.", strength: "합리적 분석력, 문제 해결 능력, 통찰력", tip: "주민들에게 계획을 공유할 때 조금 더 친근하게 다가가 보세요." },
+            "ISFJ": { title: "언제나 든든하고 세심한 마을의 등대", desc: "눈에 띄지 않는 곳에서도 이웃들을 세심하게 챙기고, 행정 안내를 꼼꼼하게 전달하여 주민들의 신뢰가 두텁습니다.", strength: "헌신적인 태도, 세심한 관찰력, 꾸준함", tip: "때로는 단호하게 거절해야 할 때 거절하는 지혜도 필요합니다." },
+            "INFJ": { title: "깊은 통찰력으로 이웃을 품는 상담가", desc: "주민들의 숨은 고충과 마음속 아픔까지 깊이 헤아리며, 진심 어린 위로와 해결책을 건네는 따뜻한 통장님입니다.", strength: "깊은 공감대, 따뜻한 중재, 묵직한 신뢰", tip: "업무와 감정을 적절히 분리하여 스트레스를 관리하세요." },
+            "ESTP": { title: "현장을 발로 뛰는 해결사 통장님", desc: "복잡한 설명보다 현장에 먼저 달려가 문제를 시원시원하게 해결하며, 위기 상황 대처 능력이 뛰어납니다.", strength: "임기응변, 빠른 행동력, 시원한 소통", tip: "공문을 꼼꼼히 살피고 장기적인 절차도 함께 신경 쓰세요." },
+            "ENTP": { title: "새로운 아이디어가 넘치는 마을 혁신가", desc: "관행에 얽매이지 않고 더 나은 마을 운영 방식을 끊임없이 제안하며 활력을 불어넣습니다.", strength: "창의적인 기획, 유연한 사고, 활기찬 분위기", tip: "기존의 행정 절차와 규칙을 존중하는 태도도 중요합니다." },
+            "ESFP": { title: "마을 잔치의 분위기 메이커 활력소", desc: "유쾌하고 밝은 에너지로 주민 모임에 생기를 불어넣고, 누구와도 금방 친해지는 친화력을 가졌습니다.", strength: "탁월한 친화력, 밝은 에너지, 현장 적응력", tip: "중요한 행정 서류 마감일을 놓치지 않도록 꼼꼼히 챙기세요." },
+            "ENFP": { title: "열정 가득한 마을 활동가", desc: "주민들과 어울리는 것을 진심으로 즐기며, 새로운 행사나 복지 프로그램에 적극적으로 아이디어를 냅니다.", strength: "넘치는 열정, 긍정적 사고, 주민 소통력", tip: "마감일과 세부적인 실무 절차를 차근차근 정리하는 습관을 가져보세요." },
+            "ISTP": { title: "필요할 때 완벽하게 해내는 실속파", desc: "말보다는 행동으로 보여주며, 복잡한 민원이나 시설 문제를 깔끔하고 군더더기 없이 처리합니다.", strength: "실용적 문제 해결, 침착함, 효율성", tip: "주민들에게 조금 더 다정한 인사를 건네면 호감도가 배가 됩니다." },
+            "INTP": { title: "합리적이고 객관적인 마을 분석가", desc: "마을의 현안을 객관적으로 분석하고, 가장 효율적이고 논리적인 대안을 찾아내는 지적인 통장님입니다.", strength: "객관성, 논리적 사고, 공정한 판단", tip: "주민들의 감정적인 호소에도 따뜻한 공감을 표현해 주세요." },
+            "ISFP": { title: "마을의 평화를 지키는 온화한 협력자", desc: "주민들과 다투지 않고 조용히 조화를 이루며, 도움이 필요한 곳에 따뜻한 손길을 내미는 평화주의자입니다.", strength: "온화함, 수용성, 깊은 배려심", tip: "내 주장을 조금 더 적극적으로 목소리 내어 표현해 보세요." },
+            "INFP": { title: "따뜻한 마음으로 이웃을 아끼는 낭만 통장", desc: "마을에 대한 애정이 깊고, 소외된 주민 한 분 한 분에게 진심 어린 마음을 쏟는 감성적인 통장님입니다.", strength: "진정성, 따뜻한 감성, 이웃 사랑", tip: "객관적인 행정 업무 처리와 균형을 맞추면 더욱 훌륭합니다." }
+        };
+
+        function calculateResult() {
+            loadingScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const e_i = scores.E >= scores.I ? "E" : "I";
+            const s_n = scores.S >= scores.N ? "S" : "N";
+            const t_f = scores.T >= scores.F ? "T" : "F";
+            const j_p = scores.J >= scores.P ? "J" : "P";
+            const a_t = scores.A >= scores.T_score ? "A" : "T";
+
+            const baseMbti = `${e_i}${s_n}${t_f}${j_p}`;
+            const fullMbti = `${baseMbti}-${a_t}`;
+
+            document.getElementById('result-mbti').textContent = fullMbti;
+            
+            const info = mbtiDescriptions[baseMbti] || {
+                title: "마을 행정의 멀티플레이어 통장님",
+                desc: "다양한 현장 업무를 유연하게 소화하며 주민들을 위해 헌신하는 멋진 통장님입니다.",
+                strength: "높은 적응력, 책임감",
+                tip: "꾸준한 소통으로 마을의 중심을 잡아주세요."
+            };
+
+            document.getElementById('result-title').textContent = info.title;
+            document.getElementById('result-desc').textContent = info.desc;
+            document.getElementById('result-strength').textContent = info.strength;
+            document.getElementById('result-tip').textContent = info.tip;
+
+            const ctx = document.getElementById('mbtiChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['외향(E) vs 내향(I)', '감각(S) vs 직관(N)', '사고(T) vs 감정(F)', '판단(J) vs 인식(P)', '자기확신(A) vs 신중(T)'],
+                    datasets: [{
+                        label: '성향 비율',
+                        data: [
+                            Math.round((scores.E / (scores.E + scores.I || 1)) * 100),
+                            Math.round((scores.S / (scores.S + scores.N || 1)) * 100),
+                            Math.round((scores.T / (scores.T + scores.F || 1)) * 100),
+                            Math.round((scores.J / (scores.J + scores.P || 1)) * 100),
+                            Math.round((scores.A / (scores.A + scores.T_score || 1)) * 100)
+                        ],
+                        backgroundColor: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { callback: function(value) { return value + '%'; } } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
